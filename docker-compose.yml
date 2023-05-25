@@ -1,0 +1,122 @@
+# version: "3.9"
+# services:
+#   postgres:
+#     image: postgres:14.3
+#     restart: always
+#     ports:
+#       - 5432:5432
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: 12345678
+#       POSTGRES_DB: postgres
+#     container_name: postgresdb
+#     volumes:
+#       - clasedb:/var/lib/postgresql/data
+#       - ./respaldos:/respaldos
+#       - ./postgres:/var/lib/postgresql/data
+#     networks:
+#       - clase
+#       - default
+#     # env_file:
+#     #   - ./registro-notas-escolares/.env
+#   pgadmin:
+#     image: dpage/pgadmin4
+#     container_name: pgadmindb
+#     restart: always
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: admin@test.com
+#       PGADMIN_DEFAULT_PASSWORD: 12345678
+#     volumes:
+#       - pgavolumen:/var/lib/pgadmin
+#       - ./respaldos:/respaldos
+#     ports:
+#       - 8082:80
+#     networks:
+#       - clase
+#       - default
+#   nest:
+#     image: node
+#     container_name: nest
+#     build:
+#       context: ./registro-notas-escolares
+#       dockerfile: Dockerfile
+#     environment:
+#       - DB_HOST=localhost
+#       - DB_PORT=5432
+#       - DB_NAME=postgres
+#       - DB_USERNAME=postgres
+#       - DB_PASSWORD=12345678
+#     restart: always
+#     networks:
+#       - clase
+#       - default
+#     ports:
+#       - 3000:3000
+#   react:
+#     image: node
+#     container_name: react
+#     build:
+#       context: ./students-notes
+#       dockerfile: Dockerfile
+#     environment:
+#       - DB_HOST=localhost
+#       - DB_PORT=5432
+#       - DB_NAME=postgres
+#       - DB_USERNAME=postgres
+#       - DB_PASSWORD=12345678
+#     restart: always
+#     networks:
+#       - clase
+#       - default
+#     ports:
+#       - 4000:4000
+# networks:
+#   clase:
+#     driver: bridge
+#     name: clase
+
+# volumes:
+#   clasedb:
+#   pgavolumen:
+
+version: "3"
+services:
+  postgres:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+    container_name: postgres
+    volumes:
+      - ./registro-notas-escolares/postgres:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  nest:
+    build:
+      context: ./registro-notas-escolares
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=12345678
+      - DB_NAME=postgres
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
